@@ -15,3 +15,4 @@ class MinHashing:
             for shingle in shingles:
                 hashed.append((self.a[i] * shingle + self.b[i]) % self.c)
             signature.append(min(hashed))
+        return signature

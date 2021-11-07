@@ -1,5 +1,6 @@
 from CompareSet import CompareSet
-
+from MinHashing import MinHashing
+from CompareSignatures import CompareSignatures
 
 class Shingling:
     def __init__(self, k):
@@ -21,7 +22,7 @@ class Shingling:
 if __name__ == "__main__":
     f = open("data/225900newsML.txt", "r")
     doc = f.read()
-    shing = Shingling(2)
+    shing = Shingling(5)
     hashed_shing1 = shing.shingle_document(doc)
 
     f2 = open("data/120600newsML.txt", "r")
@@ -30,3 +31,11 @@ if __name__ == "__main__":
 
     compare = CompareSet()
     print(compare.jaccard_similarity(hashed_shing1, hashed_shing2))
+
+    minhash = MinHashing(150)
+    col_doc1 = minhash.compute_signature(hashed_shing1)
+    print((col_doc1))
+
+    col_doc2 = minhash.compute_signature(hashed_shing2)
+    compare_sign = CompareSignatures()
+    print(compare_sign.compare(col_doc1,col_doc2))
