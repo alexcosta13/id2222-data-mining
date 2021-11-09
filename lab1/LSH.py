@@ -13,7 +13,7 @@ class LSH:
         buckets = [[[] for _ in range(self.n_buckets)] for _ in range(self.b)]
         for band in range(self.b):
             for doc_id, doc in enumerate(signatures):
-                doc = doc[band*self.r:(band+1)*self.r]
+                doc = doc[band * self.r:(band + 1) * self.r]
                 hashed = hash("".join([str(elem) for elem in doc])) % self.n_buckets
                 buckets[band][hashed].append(doc_id)
 
