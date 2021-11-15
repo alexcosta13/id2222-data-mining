@@ -6,11 +6,11 @@ class Shingling:
         self.k = k
 
     def shingle_document(self, document):
-        document = document.translate(str.maketrans('','',string.punctuation))
+        document = document.translate(str.maketrans("", "", string.punctuation))
 
         shingle = []
         for i in range(len(document) - self.k + 1):
-            shingle.append(document[i:i + self.k])
+            shingle.append(document[i : i + self.k])
         shingle = list(set(shingle))
         shingle = list(map(self.hash, shingle))
         shingle.sort()

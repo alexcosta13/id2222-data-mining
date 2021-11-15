@@ -4,8 +4,8 @@ import random
 class MinHashing:
     def __init__(self, n):
         self.n = n
-        self.a = [random.randint(0, n ** n) for _ in range(n)]
-        self.b = [random.randint(0, n ** n) for _ in range(n)]
+        self.a = [random.randint(0, 2 ** 32 - 1) for _ in range(n)]
+        self.b = [random.randint(0, 2 ** 32 - 1) for _ in range(n)]
         self.c = 4294971673
 
     def compute_signature(self, shingles):
