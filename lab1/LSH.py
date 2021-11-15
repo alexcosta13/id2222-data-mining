@@ -3,13 +3,20 @@ from itertools import combinations
 
 class LSH:
     def __init__(self, b):
+        """
+        :param b: number of bands
+        """
         self.b = b
 
     def find_candidates(self, signatures):
+        """
+        Applies the LSH algorithm to find a list of candidate pairs to be similar documents.
+        :param signatures:
+        :return: list of candidate pairs (tuples)
+        """
         r = int(len(signatures[0]) / self.b)
-        assert self.b * r == len(
-            signatures[0]
-        ), "number of buckets is not a divisor of number of rows"
+        assert self.b * r == len(signatures[0]),\
+            "number of buckets is not a divisor of number of rows"
         buckets = [{} for _ in range(self.b)]
         for band in range(self.b):
             for doc_id, doc in enumerate(signatures):
