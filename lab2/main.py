@@ -11,7 +11,9 @@ def main():
         baskets.append(list(map(int, line.split(' '))))
 
     apriori = Apriori()
-    print(apriori.aprori_algorithm(baskets, 0.005))
+    itemsets = apriori.aprori_algorithm(baskets, 0.005)
+
+    print(apriori.generate_association_rules(itemsets))
 
 
 if __name__ == "__main__":
