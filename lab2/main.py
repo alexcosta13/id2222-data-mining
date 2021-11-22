@@ -8,13 +8,13 @@ from apriori import Apriori
 def support(args, baskets):
     apriori = Apriori()
     count = apriori.aprori_algorithm(baskets, args.support)
-    print(count)
+    print("Frequent items:", count)
 
     rules = apriori.generate_association_rules(count, args.confidence)
-    print(rules)
+    print("Association rules:", rules)
 
 
-def support_experiment(args, baskets):
+def support_experiment(baskets):
     # Test a priori algorithm for different support values
     apriori = Apriori()
 
@@ -34,7 +34,7 @@ def support_experiment(args, baskets):
             length = len([item for item in items if len(item) == i])
 
 
-def confidence_experiment(args, baskets):
+def confidence_experiment(baskets):
     # Test associations for different support values and confidence values.
     apriori = Apriori()
 
@@ -47,6 +47,15 @@ def confidence_experiment(args, baskets):
                 f"Generating associations rules with support {s} and confidence {c} yields {len(rules)} rules:"
             )
             print(json.dumps(rules, indent=2))
+
+
+def describe_dataset(baskets):
+    print("Number of baskets:", len(baskets))
+    print("Avg basket size:", sum([len(b) for b in baskets]) / len(baskets))
+    print(
+        "Number of different items:",
+        len(set([item for basket in baskets for item in basket])),
+    )
 
 
 def main():
@@ -74,18 +83,35 @@ def main():
         help="confidence (default: 0.5)",
     )
     parser.add_argument(
-        "--s_experiment", dest="s_experiment", default=False, action="store_true"
+        "--s_experiment",
+        dest="s_experiment",
+        default=False,
+        action="store_true",
+        help="run support experiment",
     )
     parser.add_argument(
-        "--c_experiment", dest="c_experiment", default=False, action="store_true"
+        "--c_experiment",
+        dest="c_experiment",
+        default=False,
+        action="store_true",
+        help="run confidence experiment",
+    )
+    parser.add_argument(
+        "--dataset",
+        dest="dataset",
+        default=False,
+        action="store_true",
+        help="describe dataset",
     )
 
     args = parser.parse_args()
 
     if args.s_experiment:
-        support_experiment(args, baskets)
+        support_experiment(baskets)
     elif args.c_experiment:
-        confidence_experiment(args, baskets)
+        confidence_experiment(baskets)
+    elif args.dataset:
+        describe_dataset(baskets)
     else:
         support(args, baskets)
 

@@ -70,7 +70,7 @@ class Apriori:
         """
         n_baskets = len(baskets)
         count_items = self.count_singletons(baskets)
-        support = int(support*n_baskets)
+        support = int(support * n_baskets)
         acc_count = self.filter(count_items, support)
         frequent_items = acc_count.keys()
         item_sets = [(item,) for item in frequent_items]
