@@ -3,6 +3,11 @@ import itertools
 
 class Apriori:
     def count_singletons(self, baskets):
+        """
+        Count all the elements in the baskets
+        :param baskets: list of all elements
+        :return: dictionary of the count (elem: count of the element)
+        """
         count = {}
         for basket in baskets:
             for elem in basket:
@@ -13,6 +18,12 @@ class Apriori:
         return count
 
     def make_combinations(self, item_sets, frequent_items):
+        """
+        Make combinations by concatenating every item in item_sets with all frequent items.
+        :param item_sets: list of all items
+        :param frequent_items: Singletons of frequent items
+        :return: all list of possible combinations
+        """
         candidates = {}
         for item in item_sets:
             for single_item in frequent_items:
@@ -22,6 +33,12 @@ class Apriori:
         return candidates
 
     def count_tuples(self, baskets, combinations):
+        """
+        Count in how many baskets does each tuple appear.
+        :param baskets: list of all elements
+        :param combinations: a possible tuple
+        :return: dictionary with the tuple as a key and the count as a value
+        """
         count = combinations.copy()
         candidates_length = len(list(combinations.keys())[0])
         for basket in baskets:
@@ -32,10 +49,25 @@ class Apriori:
         return count
 
     def filter(self, count, support):
+        """
+        Filter all the elements that are bellow the support
+        :param count: dictionary that contains the count of all elements
+        :param support: number of baskets that contain a given itemset
+        :return: dictionary with key and count of all filtered elements
+        """
+
         return {key: value for key, value in count.items() if value >= support}
 
     def aprori_algorithm(self, baskets, support):
+        """
+        Performs a priori algorithm
+        :param baskets: list of all elements
+        :param support: fraction of baskets that contain a given itemset
+        :return: all frequent itemsets
+        """
+        n_baskets = len(baskets)
         count_items = self.count_singletons(baskets)
+        support = int(support*n_baskets)
         acc_count = self.filter(count_items, support)
         frequent_items = acc_count.keys()
         item_sets = [(item,) for item in frequent_items]
@@ -51,6 +83,13 @@ class Apriori:
         return acc_count
 
     def generate_association_rules(self, count, confidence):
+        """
+        Generate association rules
+        :param count: count of all the frequent tuples
+        :param confidence: fraction of number of baskets that appear
+        I and j out of the number of baskets that appears j
+        :return: associations
+        """
         associations = {}
         frequent_set = count.keys()
         for itemset in frequent_set:

@@ -15,9 +15,10 @@ def support(args, baskets):
 
 
 def support_experiment(args, baskets):
+    # Test a priori algorithm for different support values
     apriori = Apriori()
 
-    for s in [1000, 750, 500, 250]:
+    for s in [0.01, 0.0075, 0.005, 0.0025]:
         start = time()
         count = apriori.aprori_algorithm(baskets, s)
         end = time()
@@ -34,9 +35,10 @@ def support_experiment(args, baskets):
 
 
 def confidence_experiment(args, baskets):
+    # Test associations for different support values and confidence values.
     apriori = Apriori()
 
-    for s in [1000, 900, 800]:
+    for s in [0.01, 0.009, 0.008]:
         count = apriori.aprori_algorithm(baskets, s)
 
         for c in [0.9, 0.8, 0.7]:
@@ -60,9 +62,9 @@ def main():
     parser.add_argument(
         "--support",
         "-s",
-        type=int,
-        default=1000,
-        help="support (default: 1000)",
+        type=float,
+        default=0.01,
+        help="support (default: 0.01)",
     )
     parser.add_argument(
         "--confidence",
