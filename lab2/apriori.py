@@ -29,7 +29,11 @@ class Apriori:
             for single_item in frequent_items:
                 if single_item not in item:
                     candidate = tuple(sorted(item + (single_item,)))
-                    candidates[candidate] = 0
+                    for comb in itertools.combinations(candidate, len(candidate) - 1):
+                        if tuple(sorted(comb)) not in item_sets:
+                            break
+                    else:
+                        candidates[candidate] = 0
         return candidates
 
     def count_tuples(self, baskets, combinations):
@@ -55,7 +59,6 @@ class Apriori:
         :param support: number of baskets that contain a given itemset
         :return: dictionary with key and count of all filtered elements
         """
-
         return {key: value for key, value in count.items() if value >= support}
 
     def aprori_algorithm(self, baskets, support):
@@ -75,6 +78,8 @@ class Apriori:
 
         while len(item_sets) > 0:
             combinations = self.make_combinations(item_sets, frequent_items)
+            if len(combinations) == 0:
+                break
             tuples_count = self.count_tuples(baskets, combinations)
             count = self.filter(tuples_count, support)
             item_sets = count.keys()
