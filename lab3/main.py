@@ -1,6 +1,7 @@
 from triestbase import TriestBase
+from triestimpr import TriestImpr
 
-M = 88234
+M = 2000
 
 
 def main():
@@ -12,9 +13,10 @@ def main():
         line = line.strip()
         edges.append(tuple(map(int, line.split(" "))))
 
-    print("number of edges:", len(edges))
+    print("Number of edges:", len(edges))
 
     tb = TriestBase(M)
+    tb = TriestImpr(M)
     for edge in edges:
         tb.process_sample(edge)
 
