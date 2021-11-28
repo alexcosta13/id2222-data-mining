@@ -3,7 +3,6 @@ import time
 
 import matplotlib.pyplot as plt
 import seaborn as sns
-from tqdm import tqdm
 
 from triestbase import TriestBase
 from triestimpr import TriestImpr
@@ -16,9 +15,11 @@ def triest(args, edges):
     for edge in edges:
         tb.process_sample(edge)
 
-    print(f"Number of edges: {len(edges)}\n"
-          f"Estimated number of triangles: {tb.get_triangle_count()}\n"
-          f"Reservoir size: {args.M}\tTime: {time.time() - start}s")
+    print(
+        f"Number of edges: {len(edges)}\n"
+        f"Estimated number of triangles: {tb.get_triangle_count()}\n"
+        f"Reservoir size: {args.M}\tTime: {time.time() - start}s"
+    )
 
 
 def m_experiment(args, edges):
@@ -37,20 +38,22 @@ def m_experiment(args, edges):
 
 def variance_experiment(edges):
     xs, ys, hue = [], [], []
-    for algorithm in ['base', 'impr']:
+    for algorithm in ["base", "impr"]:
         for _ in range(5):
-            for m in tqdm([1000*i for i in range(1, 21, 4)]):
-                tb = TriestBase(m) if algorithm == 'base' else TriestImpr(m)
+            for m in [1000 * i for i in range(1, 21, 4)]:
+                tb = TriestBase(m) if algorithm == "base" else TriestImpr(m)
                 for edge in edges:
                     tb.process_sample(edge)
                 xs.append(m)
                 ys.append(tb.get_triangle_count())
-                hue.append('Trièst base') if algorithm == 'base' else hue.append('Trièst impr')
+                hue.append("Trièst base") if algorithm == "base" else hue.append(
+                    "Trièst impr"
+                )
 
     sns.lineplot(x=xs, y=ys, hue=hue)
-    plt.xlabel('M (reservoir sample size)')
-    plt.ylabel('Estimated number of triangles')
-    plt.legend(title='Algorithm')
+    plt.xlabel("M (reservoir sample size)")
+    plt.ylabel("Estimated number of triangles")
+    plt.legend(title="Algorithm")
     plt.show()
 
 
@@ -71,7 +74,9 @@ def main():
         help="M (default: 1000, min: 6)",
     )
     parser.add_argument(
-        "--impr", "--improved", "-I",
+        "--impr",
+        "--improved",
+        "-I",
         dest="impr",
         default=False,
         action="store_true",
