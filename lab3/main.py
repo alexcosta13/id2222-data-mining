@@ -2,11 +2,11 @@ import argparse
 import time
 
 import matplotlib.pyplot as plt
+import seaborn as sns
+from tqdm import tqdm
 
 from triestbase import TriestBase
 from triestimpr import TriestImpr
-
-M = 2000
 
 
 def triest(args, edges):
@@ -23,19 +23,35 @@ def triest(args, edges):
 
 def m_experiment(args, edges):
     xs, ys = [], []
-    for m in [1000 * i for i in range(1, 10)]:
-        tb = TriestImpr(args.M) if args.impr else TriestBase(args.M)
+    for m in [1000 * i for i in range(1, 50, 10)]:
+        tb = TriestImpr(m) if args.impr else TriestBase(m)
         for edge in edges:
             tb.process_sample(edge)
         xs.append(m)
         ys.append(tb.get_triangle_count())
 
-    plt.plot(xs, ys)
+    print(ys)
+    sns.lineplot(x=xs, y=ys)
     plt.show()
 
 
 def variance_experiment(edges):
-    pass
+    xs, ys, hue = [], [], []
+    for algorithm in ['base', 'impr']:
+        for _ in range(5):
+            for m in tqdm([1000*i for i in range(1, 21, 4)]):
+                tb = TriestBase(m) if algorithm == 'base' else TriestImpr(m)
+                for edge in edges:
+                    tb.process_sample(edge)
+                xs.append(m)
+                ys.append(tb.get_triangle_count())
+                hue.append('Trièst base') if algorithm == 'base' else hue.append('Trièst impr')
+
+    sns.lineplot(x=xs, y=ys, hue=hue)
+    plt.xlabel('M (reservoir sample size)')
+    plt.ylabel('Estimated number of triangles')
+    plt.legend(title='Algorithm')
+    plt.show()
 
 
 def main():
