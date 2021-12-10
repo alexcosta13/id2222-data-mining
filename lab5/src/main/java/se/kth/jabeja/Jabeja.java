@@ -62,32 +62,55 @@ public class Jabeja {
    */
   private void sampleAndSwap(int nodeId) {
     Node partner = null;
-    Node nodep = entireGraph.get(nodeId);
+    Node nodeP = entireGraph.get(nodeId);
 
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.LOCAL) {
       // swap with random neighbors
-      // TODO
+      partner = this.findPartner(nodeId, nodeP.getNeighbours());
     }
 
-    if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
+    if ((config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID && partner == null)
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM) {
       // if local policy fails then randomly sample the entire graph
-      // TODO
+      partner = this.findPartner(nodeId, getSample(nodeId));
     }
 
     // swap the colors
-    // TODO
+    if (partner != null) {
+      int partnerColor = partner.getColor();
+      partner.setColor(nodeP.getColor());
+      nodeP.setColor(partnerColor);
+      this.numberOfSwaps ++;
+    }
+
   }
 
-  public Node findPartner(int nodeId, Integer[] nodes){
+  public Node findPartner(int nodeId, ArrayList<Integer> nodes){
 
-    Node nodep = entireGraph.get(nodeId);
+    Node nodeP = entireGraph.get(nodeId);
+    float alpha = this.config.getAlpha();
 
     Node bestPartner = null;
     double highestBenefit = 0;
 
-    // TODO
+    for (int q : nodes) {
+      Node nodeQ = entireGraph.get(q);
+      int dpp = getDegree(nodeP, nodeP.getColor());
+      int dqq = getDegree(nodeQ, nodeQ.getColor());
+      double oldV = Math.pow(dpp, alpha) + Math.pow(dqq, alpha);
+
+      int dpq = getDegree(nodeP, nodeQ.getColor());
+      int dqp = getDegree(nodeQ, nodeP.getColor());
+      double newV = Math.pow(dpq, alpha) + Math.pow(dqp, alpha);
+
+      if (newV * this.T > oldV && newV > highestBenefit) {
+        bestPartner = nodeQ;
+        highestBenefit = newV;
+      }
+
+      return bestPartner;
+    }
 
     return bestPartner;
   }
@@ -114,7 +137,7 @@ public class Jabeja {
    * @param currentNodeId
    * @return Returns a uniformly random sample of the graph
    */
-  private Integer[] getSample(int currentNodeId) {
+  private ArrayList<Integer> getSample(int currentNodeId) {
     int count = config.getUniformRandomSampleSize();
     int rndId;
     int size = entireGraph.size();
@@ -131,8 +154,7 @@ public class Jabeja {
         break;
     }
 
-    Integer[] ids = new Integer[rndIds.size()];
-    return rndIds.toArray(ids);
+    return rndIds;
   }
 
   /**

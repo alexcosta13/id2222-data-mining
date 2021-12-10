@@ -9,5 +9,3 @@ if [ "$#" -ne 1 ] ; then
 fi
 
 gnuplot -e "filename='$1'" graph.gnuplot
-
-xdg-open graph.png
