@@ -1,6 +1,7 @@
 package se.kth.jabeja;
 
 import org.apache.log4j.Logger;
+import se.kth.jabeja.config.AnnealingPolicy;
 import se.kth.jabeja.config.Config;
 import se.kth.jabeja.config.NodeSelectionPolicy;
 import se.kth.jabeja.io.FileIO;
@@ -19,8 +20,7 @@ public class Jabeja {
   private int round;
   private float T;
   private boolean resultFileCreated = false;
-  private float MIN_TEMPERATURE = 0.001f;
-  private String ANNEALING_POLICY = "ANNEALING_LINEAR";
+  private final float MIN_TEMPERATURE = 0.001f;
 
   //-------------------------------------------------------------------
   public Jabeja(HashMap<Integer, Node> graph, Config config) {
@@ -56,14 +56,13 @@ public class Jabeja {
    */
   private void saCoolDown(){
     // TODO for second task
-    if(ANNEALING_POLICY.equals("ANNEALING_LINEAR")){
-      System.out.println("saCoolDown annealing linear" + T);
+    if(config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_LINEAR) {
       if (T > 1)
         T -= config.getDelta();
       if (T < 1)
         T = 1;
 
-    }else if (ANNEALING_POLICY.equals("ANNEALING_ACCEPTANCE")) {
+    } else if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_ACCEPTANCE) {
       if (T > MIN_TEMPERATURE)
         T *= config.getAlpha();
       if (T < MIN_TEMPERATURE)
@@ -119,7 +118,7 @@ public class Jabeja {
       int dqp = getDegree(nodeQ, nodeP.getColor());
       double newV = Math.pow(dpq, alpha) + Math.pow(dqp, alpha);
 
-      if (ANNEALING_POLICY.equals("ANNEALING_LINEAR")) {
+      if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_LINEAR) {
         if (newV * this.T > oldV && newV > highestBenefit) {
           bestPartner = nodeQ;
           highestBenefit = newV;

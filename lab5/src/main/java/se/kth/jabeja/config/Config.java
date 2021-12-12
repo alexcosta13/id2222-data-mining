@@ -4,6 +4,7 @@ public class Config {
   private Integer numPartitions;
   private Integer rounds;
   private Integer randomNeighborsSampleSize;
+  private AnnealingPolicy annealingPolicy;
   private Float temperature;
   private Float delta;
   private Integer seed;
@@ -54,6 +55,11 @@ public class Config {
     return this;
   }
 
+  public Config setAnnealingPolicy(AnnealingPolicy annealingPolicy) {
+    this.annealingPolicy = annealingPolicy;
+    return this;
+  }
+
   public Config setTemperature(Float temperature) {
     this.temperature = temperature;
     return this;
@@ -93,6 +99,13 @@ public class Config {
       throw new NullPointerException("Close by neighbors are not set");
     }
     return randomNeighborsSampleSize;
+  }
+
+   public AnnealingPolicy getAnnealingPolicy() {
+    if (annealingPolicy == null) {
+      throw new NullPointerException("Annealing policy is not set");
+    }
+    return annealingPolicy;
   }
 
   public Float getTemperature() {

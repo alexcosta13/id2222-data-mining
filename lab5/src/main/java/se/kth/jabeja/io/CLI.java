@@ -3,6 +3,7 @@ package se.kth.jabeja.io;
 import org.apache.log4j.Logger;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
+import se.kth.jabeja.config.AnnealingPolicy;
 import se.kth.jabeja.config.Config;
 import se.kth.jabeja.config.GraphInitColorPolicy;
 import se.kth.jabeja.config.NodeSelectionPolicy;
@@ -28,6 +29,10 @@ public class CLI {
   @Option(name = "-uniformRandSampleSize", usage = "Uniform random sample size.")
   private int UNIFORM_RAND_SAMPLE_SIZE = 6;
 
+  @Option(name = "-graphInitColorSelectionPolicy", usage = "Annealing policy. Supported: LINEAR, ACCEPTANCE, IMPROVED")
+  private String ANNEALING_POLICY = "LINEAR";
+  private AnnealingPolicy annealingPolicy = AnnealingPolicy.ANNEALING_LINEAR;
+
   @Option(name = "-temp", usage = "Simulated annealing temperature.")
   private float TEMPERATURE = 2;
 
@@ -37,17 +42,17 @@ public class CLI {
   @Option(name = "-seed", usage = "Seed.")
   private int SEED = 0;
 
-  @Option(name = "-alpha", usage = "Alpah parameter")
+  @Option(name = "-alpha", usage = "Alpha parameter")
   private float ALPHA = 2;
 
   @Option(name = "-randNeighborsSampleSize", usage = "Number of random neighbors sample size.")
   private int randNeighborsSampleSize = 3;
 
-  @Option(name = "-graphInitColorSelectionPolicy", usage = "Initial color celection policy. Supported, RANDOM, ROUND_ROBIN, BATCH")
+  @Option(name = "-graphInitColorSelectionPolicy", usage = "Initial color selection policy. Supported, RANDOM, ROUND_ROBIN, BATCH")
   private String GRAPH_INIT_COLOR_SELECTION_POLICY = "ROUND_ROBIN";
   private GraphInitColorPolicy graphInitColorSelectionPolicy = GraphInitColorPolicy.ROUND_ROBIN;
 
-  @Option(name = "-nodeSelectionPolicy", usage = "Node selection plicy. Supported, RANDOM, LOCAL, HYBRID")
+  @Option(name = "-nodeSelectionPolicy", usage = "Node selection policy. Supported, RANDOM, LOCAL, HYBRID")
   private String NODE_SELECTION_POLICY = "HYBRID";
   private NodeSelectionPolicy nodeSelectionPolicy = NodeSelectionPolicy.HYBRID;
 
@@ -71,6 +76,16 @@ public class CLI {
         graphInitColorSelectionPolicy = GraphInitColorPolicy.ROUND_ROBIN;
       } else {
         throw new IllegalArgumentException("Initial color selection policy is not supported");
+      }
+
+      if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_LINEAR.toString()) == 0) {
+        annealingPolicy = AnnealingPolicy.ANNEALING_LINEAR;
+      } else if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_ACCEPTANCE.toString()) == 0) {
+        annealingPolicy = AnnealingPolicy.ANNEALING_ACCEPTANCE;
+      } else if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_IMPROVED.toString()) == 0) {
+        annealingPolicy = AnnealingPolicy.ANNEALING_IMPROVED;
+      } else {
+        throw new IllegalArgumentException("Annealing policy is not supported");
       }
 
       if (NODE_SELECTION_POLICY.compareToIgnoreCase(NodeSelectionPolicy.RANDOM.toString()) == 0) {
@@ -105,6 +120,7 @@ public class CLI {
             .setUniformRandSampleSize(UNIFORM_RAND_SAMPLE_SIZE)
             .setRounds(ROUNDS)
             .setSeed(SEED)
+            .setAnnealingPolicy(annealingPolicy)
             .setTemperature(TEMPERATURE)
             .setGraphFilePath(GRAPH)
             .setNodeSelectionPolicy(nodeSelectionPolicy)
