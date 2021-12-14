@@ -2,4 +2,6 @@
 /target
 .iml
 /output
-3elt.png
+*.png
+.gradle/
+gradle/

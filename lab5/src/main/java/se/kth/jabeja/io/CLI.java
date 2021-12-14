@@ -3,10 +3,7 @@ package se.kth.jabeja.io;
 import org.apache.log4j.Logger;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
-import se.kth.jabeja.config.AnnealingPolicy;
-import se.kth.jabeja.config.Config;
-import se.kth.jabeja.config.GraphInitColorPolicy;
-import se.kth.jabeja.config.NodeSelectionPolicy;
+import se.kth.jabeja.config.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -29,9 +26,12 @@ public class CLI {
   @Option(name = "-uniformRandSampleSize", usage = "Uniform random sample size.")
   private int UNIFORM_RAND_SAMPLE_SIZE = 6;
 
-  @Option(name = "-graphInitColorSelectionPolicy", usage = "Annealing policy. Supported: LINEAR, ACCEPTANCE, IMPROVED")
+  @Option(name = "-annealingPolicy", usage = "Acceptance function. Supported: LINEAR, REGULAR, IMPROVED")
   private String ANNEALING_POLICY = "LINEAR";
   private AnnealingPolicy annealingPolicy = AnnealingPolicy.ANNEALING_LINEAR;
+
+  @Option(name = "-restartAnnealing", usage = "Restart annealing after 400 cycles.")
+  private boolean RESTART_ANNEALING = false;
 
   @Option(name = "-temp", usage = "Simulated annealing temperature.")
   private float TEMPERATURE = 2;
@@ -80,8 +80,8 @@ public class CLI {
 
       if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_LINEAR.toString()) == 0) {
         annealingPolicy = AnnealingPolicy.ANNEALING_LINEAR;
-      } else if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_ACCEPTANCE.toString()) == 0) {
-        annealingPolicy = AnnealingPolicy.ANNEALING_ACCEPTANCE;
+      } else if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_EXPONENTIAL.toString()) == 0) {
+        annealingPolicy = AnnealingPolicy.ANNEALING_EXPONENTIAL;
       } else if (ANNEALING_POLICY.compareToIgnoreCase(AnnealingPolicy.ANNEALING_IMPROVED.toString()) == 0) {
         annealingPolicy = AnnealingPolicy.ANNEALING_IMPROVED;
       } else {
@@ -121,6 +121,7 @@ public class CLI {
             .setRounds(ROUNDS)
             .setSeed(SEED)
             .setAnnealingPolicy(annealingPolicy)
+            .setRestartAnnealing(RESTART_ANNEALING)
             .setTemperature(TEMPERATURE)
             .setGraphFilePath(GRAPH)
             .setNodeSelectionPolicy(nodeSelectionPolicy)

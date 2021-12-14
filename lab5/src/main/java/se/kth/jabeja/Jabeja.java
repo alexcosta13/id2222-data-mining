@@ -20,7 +20,9 @@ public class Jabeja {
   private int round;
   private float T;
   private boolean resultFileCreated = false;
-  private final float MIN_TEMPERATURE = 0.001f;
+  private final float MIN_TEMPERATURE = 0.00001f;
+  private static final Random rand = new Random();
+  private static final float exp_alpha = 0.9f;
 
   //-------------------------------------------------------------------
   public Jabeja(HashMap<Integer, Node> graph, Config config) {
@@ -36,14 +38,20 @@ public class Jabeja {
   //-------------------------------------------------------------------
   public void startJabeja() throws IOException {
     // If annealing, maximum temperature is 1
-    //if(config.getAnnealing() && this.T > 1){
-      //this.T = 1;
-    //}
+    if(config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_EXPONENTIAL && this.T > 1){
+      this.T = 1;
+    }
     for (round = 0; round < config.getRounds(); round++) {
       for (int id : entireGraph.keySet()) {
         sampleAndSwap(id);
       }
 
+      if (round % 400 == 0 && config.getRestartAnnealing()) {
+        T =	config.getTemperature();
+        if(config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_EXPONENTIAL && this.T > 1){
+          this.T = 1;
+        }
+      }
       //one cycle for all nodes have completed.
       //reduce the temperature
       saCoolDown();
@@ -62,9 +70,9 @@ public class Jabeja {
       if (T < 1)
         T = 1;
 
-    } else if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_ACCEPTANCE) {
+    } else if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_EXPONENTIAL) {
       if (T > MIN_TEMPERATURE)
-        T *= config.getAlpha();
+        this.T *= exp_alpha;
       if (T < MIN_TEMPERATURE)
         T = MIN_TEMPERATURE;
     }
@@ -81,13 +89,15 @@ public class Jabeja {
     if (config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.LOCAL) {
       // swap with random neighbors
-      partner = this.findPartner(nodeId, nodeP.getNeighbours());
+      partner = this.findPartner(nodeId, getNeighbors(nodeP));
     }
 
-    if ((config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID && partner == null)
+    if ((config.getNodeSelectionPolicy() == NodeSelectionPolicy.HYBRID)
             || config.getNodeSelectionPolicy() == NodeSelectionPolicy.RANDOM) {
       // if local policy fails then randomly sample the entire graph
-      partner = this.findPartner(nodeId, getSample(nodeId));
+      if (partner == null) {
+        partner = this.findPartner(nodeId, getSample(nodeId));
+      }
     }
 
     // swap the colors
@@ -100,7 +110,7 @@ public class Jabeja {
 
   }
 
-  public Node findPartner(int nodeId, ArrayList<Integer> nodes){
+  public Node findPartner(int nodeId, Integer[] nodes){
 
     Node nodeP = entireGraph.get(nodeId);
     float alpha = this.config.getAlpha();
@@ -120,6 +130,22 @@ public class Jabeja {
 
       if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_LINEAR) {
         if (newV * this.T > oldV && newV > highestBenefit) {
+          bestPartner = nodeQ;
+          highestBenefit = newV;
+        }
+      } else if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_EXPONENTIAL) {
+        double acceptance_probability = Math.exp((newV - oldV) / T);
+        double random_number = rand.nextDouble();
+
+        if ((acceptance_probability > random_number) && (newV != oldV) && (newV > highestBenefit)) {
+          bestPartner = nodeQ;
+          highestBenefit = newV;
+        }
+      } else if (config.getAnnealingPolicy() == AnnealingPolicy.ANNEALING_IMPROVED) {
+        double acceptance_probability = Math.exp((newV * 0.9 - oldV) / T);
+        double random_number = rand.nextDouble();
+
+        if ((acceptance_probability > random_number) && (newV != oldV) && (newV > highestBenefit)) {
           bestPartner = nodeQ;
           highestBenefit = newV;
         }
@@ -150,7 +176,7 @@ public class Jabeja {
    * @param currentNodeId
    * @return Returns a uniformly random sample of the graph
    */
-  private ArrayList<Integer> getSample(int currentNodeId) {
+  private Integer[] getSample(int currentNodeId) {
     int count = config.getUniformRandomSampleSize();
     int rndId;
     int size = entireGraph.size();
@@ -167,7 +193,8 @@ public class Jabeja {
         break;
     }
 
-    return rndIds;
+    Integer[] ids = new Integer[rndIds.size()];
+    return rndIds.toArray(ids);
   }
 
   /**
@@ -257,6 +284,8 @@ public class Jabeja {
             inputFile.getName() + "_" +
             "NS" + "_" + config.getNodeSelectionPolicy() + "_" +
             "GICP" + "_" + config.getGraphInitialColorPolicy() + "_" +
+            config.getAnnealingPolicy() + "_" +
+            config.getRestartAnnealing() + "_" + "RESTART_ANNEALING_" +
             "T" + "_" + config.getTemperature() + "_" +
             "D" + "_" + config.getDelta() + "_" +
             "RNSS" + "_" + config.getRandomNeighborSampleSize() + "_" +

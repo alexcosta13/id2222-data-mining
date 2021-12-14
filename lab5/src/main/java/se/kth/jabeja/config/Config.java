@@ -5,6 +5,7 @@ public class Config {
   private Integer rounds;
   private Integer randomNeighborsSampleSize;
   private AnnealingPolicy annealingPolicy;
+  private Boolean restartAnnealing;
   private Float temperature;
   private Float delta;
   private Integer seed;
@@ -60,6 +61,11 @@ public class Config {
     return this;
   }
 
+  public Config setRestartAnnealing(Boolean restartAnnealing) {
+    this.restartAnnealing = restartAnnealing;
+    return this;
+  }
+
   public Config setTemperature(Float temperature) {
     this.temperature = temperature;
     return this;
@@ -106,6 +112,13 @@ public class Config {
       throw new NullPointerException("Annealing policy is not set");
     }
     return annealingPolicy;
+  }
+
+  public Boolean getRestartAnnealing() {
+    if (restartAnnealing == null) {
+      throw new NullPointerException("Restart annealing is not set");
+    }
+    return restartAnnealing;
   }
 
   public Float getTemperature() {
